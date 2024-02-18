@@ -6,7 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
+tui = "*"
+crossterm = "*"
+arboard = "*"
+unicode-width = "0.1.11"
+rand = "0.9.0-alpha.0"
 
 # Reduce the size of the executable  file:
 [profile.release]
