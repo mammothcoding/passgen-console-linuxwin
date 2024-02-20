@@ -22,14 +22,14 @@ fn main() {
     }
 
     let start_rules = Rules {
-        letters: true,
-        numbs: true,
+        letters: false,
+        numbs: false,
         spec_symbs: true,
         let_num_drc_free: true,
     };
 
     impl Rules {
-        fn init(self) -> Rules {
+        /*fn init(self) -> Rules {
             let letters;
             let numbs;
             let spec_symbs;
@@ -134,12 +134,12 @@ fn main() {
                 spec_symbs,
                 let_num_drc_free,
             }
-        }
+        }*/
 
         fn generate_pass(self) {
             let mut rng = rand::thread_rng();
             let mut pass_assembly: Vec<&[u8]> = Vec::new();
-            let mut pass_charset: Vec<u8> = Vec::new();
+            //let mut pass_charset: Vec<u8> = Vec::new();
 
             //let mut pass_charset: & [u8] = LET_NUM_DRC_FREE;
 
@@ -157,25 +157,16 @@ fn main() {
                 pass_assembly.push(SPEC_SYMB_CHARSET);
             }
 
-            for ch_arr in pass_assembly {
-                for ch in ch_arr{
-                    pass_charset.push(ch.clone());
-                }
-            }
-            println!("pass_charset is:");
-            println!("{:?}", pass_charset);
+            let pass_charset: Vec<u8> = pass_assembly.into_iter().flatten().cloned().collect();
+            println!("Pass_charset is:\n{:?}", pass_charset);
 
             let password: String = (0..PASSWORD_LEN)
-                .map(|_| {
-                    let idx = rng.gen_range(0..pass_charset.len());
-                    pass_charset[idx] as char
-                })
+                .map(|_| pass_charset[rng.gen_range(0..pass_charset.len())] as char)
                 .collect();
 
-            println!("Password is:");
-            println!("{:?}", password);
+            println!("Password is: {:?}", password);
         }
     }
 
-    start_rules.init().generate_pass();
+    start_rules.generate_pass();
 }
