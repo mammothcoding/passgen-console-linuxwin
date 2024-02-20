@@ -143,17 +143,17 @@ fn main() {
 
             //let mut pass_charset: & [u8] = LET_NUM_DRC_FREE;
 
-            if self.let_num_drc_free == true {
+            if self.let_num_drc_free {
                 pass_assembly.push(LET_NUM_DRC_FREE);
             } else {
-                if self.letters == true {
+                if self.letters {
                     pass_assembly.push(LETTERS_CHARSET);
                 }
-                if self.numbs == true {
+                if self.numbs {
                     pass_assembly.push(NUMBERS_CHARSET);
                 }
             }
-            if self.spec_symbs == true {
+            if self.spec_symbs {
                 pass_assembly.push(SPEC_SYMB_CHARSET);
             }
 
