@@ -138,25 +138,32 @@ fn main() {
 
         fn generate_pass(self) {
             let mut rng = rand::thread_rng();
-            let mut pass_charset: & [u8] = b"";
+            let mut pass_assembly: Vec<&[u8]> = Vec::new();
+            let mut pass_charset: Vec<u8> = Vec::new();
+
             //let mut pass_charset: & [u8] = LET_NUM_DRC_FREE;
 
-            /*if self.let_num_drc_free == true {
-                pass_charset = &*[pass_charset, LET_NUM_DRC_FREE].concat();
+            if self.let_num_drc_free == true {
+                pass_assembly.push(LET_NUM_DRC_FREE);
             } else {
                 if self.letters == true {
-                    pass_charset = &*[pass_charset, LETTERS_CHARSET].concat();
+                    pass_assembly.push(LETTERS_CHARSET);
                 }
                 if self.numbs == true {
-                    pass_charset = &*[pass_charset, NUMBERS_CHARSET].concat();
+                    pass_assembly.push(NUMBERS_CHARSET);
                 }
             }
             if self.spec_symbs == true {
-                pass_charset = &*[pass_charset, SPEC_SYMB_CHARSET].concat();
-            }*/
-            if pass_charset.len() == 0 {
-                pass_charset = &*[pass_charset, LET_NUM_DRC_FREE].concat();
+                pass_assembly.push(SPEC_SYMB_CHARSET);
             }
+
+            for ch_arr in pass_assembly {
+                for ch in ch_arr{
+                    pass_charset.push(ch.clone());
+                }
+            }
+            println!("pass_charset is:");
+            println!("{:?}", pass_charset);
 
             let password: String = (0..PASSWORD_LEN)
                 .map(|_| {
