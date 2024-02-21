@@ -1,8 +1,8 @@
 
 
 fn main() {
-    use std::io::{self, BufRead};
-    use std::process;
+    //use std::io::{self, BufRead};
+    //use std::process;
     use rand::Rng;
     const PASSWORD_LEN: usize = 30;
     const LETTERS_CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ\
