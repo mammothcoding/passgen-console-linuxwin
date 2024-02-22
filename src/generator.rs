@@ -127,7 +127,7 @@ pub mod generator {
             }
         }*/
 
-        pub fn generate_pass(self) {
+        pub fn generate_pass(self) -> String {
             let mut rng = rand::thread_rng();
             let mut pass_assembly: Vec<&[u8]> = Vec::new();
             //let mut pass_charset: Vec<u8> = Vec::new();
@@ -149,13 +149,22 @@ pub mod generator {
             }
 
             let pass_charset: Vec<u8> = pass_assembly.into_iter().flatten().cloned().collect();
-            println!("Pass_charset is:\n{:?}", pass_charset);
+            //println!("Pass_charset is:\n{:?}", pass_charset);
 
-            let password: String = (0..PASSWORD_LEN)
+            (0..PASSWORD_LEN)
                 .map(|_| pass_charset[rng.gen_range(0..pass_charset.len())] as char)
-                .collect();
+                .collect()
 
-            println!("Password is: {:?}", password);
+            //println!("Password is: {:?}", password);
+        }
+
+        pub fn default() -> Rules {
+            Rules {
+                letters: false,
+                numbs: false,
+                spec_symbs: true,
+                let_num_drc_free: true,
+            }
         }
     }
 }
