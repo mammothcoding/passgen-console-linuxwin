@@ -1,6 +1,7 @@
 pub mod generator;
+pub mod rules;
 
-use generator::generator::Rules;
+use crate::rules::rules::Rules;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -10,11 +11,6 @@ use std::{error::Error, io};
 use ratatui::{prelude::*, widgets::*, layout::*, layout::Constraint::*};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    ///////////////////////////////////
-    //Rules::default().generate_pass();
-    ///////////////////////////////////
-
-    // setup terminal
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
@@ -42,19 +38,31 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Result<()> {
-
-    //main_ui
-    terminal.draw(|f| main_ui(f))?;
-
-    //on keys ui
     loop {
+        terminal.draw(|f| main_ui(f, &rules))?;
+
         if let Event::Key(key) = event::read()? {
             match key.code {
-                KeyCode::Enter => {
+                /*KeyCode::Enter => {
                     terminal.draw(|f| pass_ui(f, &rules))?;
-                }
+                }*/
                 KeyCode::Esc => {
                     return Ok(());
+                }
+                KeyCode::Enter => {
+                    rules.submit_message();
+                },
+                KeyCode::Char(to_insert) => {
+                    rules.enter_char(to_insert);
+                }
+                KeyCode::Backspace => {
+                    rules.delete_char();
+                }
+                KeyCode::Left => {
+                    rules.move_cursor_left();
+                }
+                KeyCode::Right => {
+                    rules.move_cursor_right();
                 }
                 _ => {}
             }
@@ -62,21 +70,13 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Resu
     }
 }
 
-fn main_ui(f: &mut Frame) {
-    fn centered_rect(area: Rect, width: u16, height: u16) -> Rect {
-        let horizontal = Layout::horizontal([width]).flex(Flex::Center);
-        let vertical = Layout::vertical([height]).flex(Flex::Center);
-        let [area] = vertical.areas(area);
-        let [area] = horizontal.areas(area);
-        area
-    }
-
-    let block = Block::default()
+fn main_ui(f: &mut Frame, rules: &Rules) {
+    let main_block = Block::default()
         .borders(Borders::ALL)
-        .border_style(Style::default().cyan().on_black())
+        .border_style(Style::default().light_green().on_black())
         .border_type(BorderType::Double)
         .on_black();
-    f.render_widget(block, f.size());
+    f.render_widget(main_block, centered_rect(Rect::new(0, 0, f.size().width, f.size().height), 60, f.size().height));
 
 
     let title1 = vec![
@@ -85,11 +85,11 @@ fn main_ui(f: &mut Frame) {
         Line::from(Span::raw("")),
     ];
     let par = Paragraph::new(title1)
-        .block(Block::new().title("").borders(Borders::ALL).border_type(BorderType::Double))
+        .block(Block::new().title("").borders(Borders::ALL).border_type(BorderType::Rounded))
         .style(Style::new().light_green().on_black())
         .alignment(Alignment::Center)
         .wrap(Wrap { trim: true });
-    f.render_widget(par, centered_rect(Rect::new(0, 2, f.size().width, 5), 36, 5));
+    f.render_widget(par, centered_rect(Rect::new(0, 1, f.size().width, 5), 36, 5));
     //println!("Password is: {:?}", f.size());
 
     let title2 = vec![
@@ -100,7 +100,7 @@ fn main_ui(f: &mut Frame) {
         ]),
         Line::from(vec![
             Span::styled("Enter", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(" to generate a passwords"),
+            Span::raw(" to generate a password"),
         ]),
     ];
     let par = Paragraph::new(title2)
@@ -108,35 +108,46 @@ fn main_ui(f: &mut Frame) {
         .style(Style::new().light_green().on_black())
         .alignment(Alignment::Left)
         .wrap(Wrap { trim: true });
-    f.render_widget(par, centered_rect(Rect::new(0, 7, f.size().width,  5), 30, 5));
+    f.render_widget(par, centered_rect(Rect::new(0, 6, f.size().width,  5), 30, 5));
 
 
+    let input_area = centered_rect(Rect::new(0, 12, f.size().width,  3), 30, 3);
+    let input = Paragraph::new(rules.pass_len.as_str())
+        .style(Style::default().fg(Color::Yellow))
+        .block(Block::default().borders(Borders::ALL).title("Password length (4 - 10000)"));
+    f.render_widget(input, input_area);
+    f.set_cursor(
+        input_area.x + rules.cursor_position as u16 + 1,
+        input_area.y + 1,
+    );
 
+
+    if rules.pwd != "" {
+        let pwd_text = vec![
+            Line::from(Span::raw("")),
+            Line::from(Span::raw(&rules.pwd).bold()),
+            Line::from(Span::raw("")),
+            Line::from(Span::raw("this password was copied to clipboard").italic().on_gray()),
+        ];
+        let par = Paragraph::new(pwd_text)
+            .block(Block::new()
+                .title("Password is")
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+                .black()
+            )
+            .black().on_white()
+            .alignment(Alignment::Center);
+        f.render_widget(par, centered_rect(Rect::new(0, 40, f.size().width, 6), 45, 6));
+    }
 }
 
-fn pass_ui(f: &mut Frame, rules: &Rules) {
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .margin(2)
-        .constraints(
-            [
-                Constraint::Length(1),
-                Constraint::Length(3),
-                Constraint::Min(1),
-            ]
-                .as_ref(),
-        )
-        .split(f.size());
 
 
-
-    let pass = Rules::default().generate_pass();
-    let content = vec![Line::from(Span::raw(format!("{}", pass)))];
-
-    let mut messages: Vec<ListItem> = Vec::new();
-    messages.push(ListItem::new(content));
-    let messages = List::new(messages)
-        .block(Block::default().borders(Borders::ALL).title("Password is:"));
-    f.render_widget(messages, chunks[2]);
+fn centered_rect(area: Rect, width: u16, height: u16) -> Rect {
+    let horizontal = Layout::horizontal([width]).flex(Flex::Center);
+    let vertical = Layout::vertical([height]).flex(Flex::Center);
+    let [area] = vertical.areas(area);
+    let [area] = horizontal.areas(area);
+    area
 }
-
