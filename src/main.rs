@@ -9,7 +9,7 @@ use ratatui::{prelude::*, widgets::*, layout::*};
 
 fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
-    let mut stdout = io::stdout();
+    let stdout = io::stdout();
     std::io::stdout().execute(EnterAlternateScreen)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
@@ -34,36 +34,42 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Resu
     loop {
         terminal.draw(|f| main_ui(f, &rules))?;
 
+        /*if event::poll(std::time::Duration::from_millis(50))? {
+            if let Event::Key(key) = event::read()? {
+                if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('q') {
+                    return Ok(true);
+                }
+            }
+        }*/
         if let Event::Key(key) = event::read()? {
-            match key.code {
-                /*KeyCode::Enter => {
-                    terminal.draw(|f| pass_ui(f, &rules))?;
-                }*/
-                KeyCode::Esc => {
-                    return Ok(());
+            if key.kind == event::KeyEventKind::Press {
+                match key.code {
+                    KeyCode::Esc => {
+                        return Ok(());
+                    }
+                    KeyCode::Enter => {
+                        rules.submit_message();
+                    }
+                    KeyCode::Char(to_insert) => {
+                        rules.enter_char(to_insert);
+                    }
+                    KeyCode::Backspace => {
+                        rules.delete_char();
+                    }
+                    KeyCode::Left => {
+                        rules.move_cursor_left();
+                    }
+                    KeyCode::Right => {
+                        rules.move_cursor_right();
+                    }
+                    KeyCode::Home => {
+                        rules.reset_cursor();
+                    }
+                    KeyCode::End => {
+                        rules.cursor_to_end();
+                    }
+                    _ => {}
                 }
-                KeyCode::Enter => {
-                    rules.submit_message();
-                },
-                KeyCode::Char(to_insert) => {
-                    rules.enter_char(to_insert);
-                }
-                KeyCode::Backspace => {
-                    rules.delete_char();
-                }
-                KeyCode::Left => {
-                    rules.move_cursor_left();
-                }
-                KeyCode::Right => {
-                    rules.move_cursor_right();
-                }
-                KeyCode::Home => {
-                    rules.reset_cursor();
-                }
-                KeyCode::End => {
-                    rules.cursor_to_end();
-                }
-                _ => {}
             }
         }
     }
@@ -150,3 +156,22 @@ fn centered_rect(area: Rect, width: u16, height: u16) -> Rect {
     let [area] = horizontal.areas(area);
     area
 }
+
+// helper function to create a centered rect using up certain percentage of the available rect `r`
+// let area = f.size();
+// let area = centered_rect(60, 20, area);
+/*fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    let popup_layout = Layout::vertical([
+        Constraint::Percentage((100 - percent_y) / 2),
+        Constraint::Percentage(percent_y),
+        Constraint::Percentage((100 - percent_y) / 2),
+    ])
+        .split(r);
+
+    Layout::horizontal([
+        Constraint::Percentage((100 - percent_x) / 2),
+        Constraint::Percentage(percent_x),
+        Constraint::Percentage((100 - percent_x) / 2),
+    ])
+        .split(popup_layout[1])[1]
+}*/
