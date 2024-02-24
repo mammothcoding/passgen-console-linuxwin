@@ -1,11 +1,6 @@
 pub mod rules {
-    use ratatui::{Frame, Terminal};
-    use ratatui::backend::Backend;
-    use ratatui::layout::{Alignment, Rect};
-    use ratatui::prelude::{Color, Line, Modifier, Span, Style};
-    use ratatui::style::Stylize;
-    use ratatui::widgets::{Block, Borders, BorderType, Paragraph, Wrap};
-    use crate::{centered_rect, main_ui};
+    use std::process::{Command, Stdio};
+    use arboard::Clipboard;
 
     pub struct Rules {
         pub letters: bool,
@@ -24,7 +19,7 @@ pub mod rules {
                 numbs: false,
                 spec_symbs: true,
                 let_num_drc_free: true,
-                cursor_position: 0,
+                cursor_position: 1,
                 pass_len: "8".parse().unwrap(),
                 pwd: "".parse().unwrap(),
             }
@@ -67,17 +62,34 @@ pub mod rules {
             }
         }
 
-        fn clamp_cursor(&self, new_cursor_pos: usize) -> usize {
+        pub fn clamp_cursor(&self, new_cursor_pos: usize) -> usize {
             new_cursor_pos.clamp(0, self.pass_len.len())
         }
 
-        fn reset_cursor(&mut self) {
+        pub fn reset_cursor(&mut self) {
             self.cursor_position = 0;
+        }
+
+        pub fn cursor_to_end(&mut self) {
+            self.cursor_position = self.pass_len.len();
         }
 
         pub fn submit_message(&mut self) {
             self.pwd = self.generate_pass();
-            //self.pass_the_pwd(pwd, terminal);
+
+            if cfg!(unix) {
+                let mut pipe = Command::new("echo").arg("-n").arg(self.pwd.clone()).stdout(Stdio::piped()).spawn().unwrap();
+                let pipe_out = pipe.stdout.take().expect("Failed to take pipe stdout");
+                let mut out = Command::new("xclip").arg("-selection").arg("clipboard").stdin(pipe_out).spawn().unwrap();
+                out.wait().expect("Failed to run xclip");
+            } else {
+                let mut clipboard = Clipboard::new().unwrap();
+                clipboard.set_text(self.pwd.clone()).expect("Copy to clipboard error");
+            }
+
+            /*let mut clipboard = Clipboard::new().unwrap();
+            clipboard.set_text(self.pwd.clone()).expect("Copy to clipboard error");*/
+
             //self.pass_len.clear();
             //self.reset_cursor();
         }

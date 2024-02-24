@@ -2,18 +2,15 @@ pub mod generator;
 pub mod rules;
 
 use crate::rules::rules::Rules;
-use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-};
+use crossterm::{terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand, event};
 use std::{error::Error, io};
-use ratatui::{prelude::*, widgets::*, layout::*, layout::Constraint::*};
+use crossterm::event::{Event, KeyCode};
+use ratatui::{prelude::*, widgets::*, layout::*};
 
 fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
-    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
+    std::io::stdout().execute(EnterAlternateScreen)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
@@ -23,12 +20,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // restore terminal
     disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
-    terminal.show_cursor()?;
+    std::io::stdout().execute(LeaveAlternateScreen)?;
+    //terminal.show_cursor()?;
 
     if let Err(err) = res {
         println!("{:?}", err)
@@ -64,6 +57,12 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Resu
                 KeyCode::Right => {
                     rules.move_cursor_right();
                 }
+                KeyCode::Home => {
+                    rules.reset_cursor();
+                }
+                KeyCode::End => {
+                    rules.cursor_to_end();
+                }
                 _ => {}
             }
         }
@@ -76,7 +75,7 @@ fn main_ui(f: &mut Frame, rules: &Rules) {
         .border_style(Style::default().light_green().on_black())
         .border_type(BorderType::Double)
         .on_black();
-    f.render_widget(main_block, centered_rect(Rect::new(0, 0, f.size().width, f.size().height), 60, f.size().height));
+    f.render_widget(main_block, centered_rect(Rect::new(0, 0, f.size().width, 50), 60, 50));
 
 
     let title1 = vec![
