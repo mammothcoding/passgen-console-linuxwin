@@ -34,13 +34,6 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Resu
     loop {
         terminal.draw(|f| main_ui(f, &rules))?;
 
-        /*if event::poll(std::time::Duration::from_millis(50))? {
-            if let Event::Key(key) = event::read()? {
-                if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                    return Ok(true);
-                }
-            }
-        }*/
         if let Event::Key(key) = event::read()? {
             if key.kind == event::KeyEventKind::Press {
                 match key.code {
@@ -48,10 +41,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Resu
                         return Ok(());
                     }
                     KeyCode::Enter => {
-                        rules.submit_message();
-                    }
-                    KeyCode::Char(to_insert) => {
-                        rules.enter_char(to_insert);
+                        rules.submit_to_pwd();
                     }
                     KeyCode::Backspace => {
                         rules.delete_char();
@@ -68,6 +58,21 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut rules: Rules) -> io::Resu
                     KeyCode::End => {
                         rules.cursor_to_end();
                     }
+                    KeyCode::Tab => {
+                        rules.circ_cursor();
+                    }
+                    KeyCode::Up => {
+                        rules.up_cursor();
+                    }
+                    KeyCode::Down => {
+                        rules.circ_cursor();
+                    }
+                    /*KeyCode::Char(' ') => {
+                        rules.toggle();
+                    }*/
+                    KeyCode::Char(to_insert) => {
+                        rules.enter_char(to_insert);
+                    }
                     _ => {}
                 }
             }
@@ -81,7 +86,7 @@ fn main_ui(f: &mut Frame, rules: &Rules) {
         .border_style(Style::default().light_green().on_black())
         .border_type(BorderType::Double)
         .on_black();
-    f.render_widget(main_block, centered_rect(Rect::new(0, 0, f.size().width, 50), 60, 50));
+    f.render_widget(main_block, centered_rect(Rect::new(0, 0, f.size().width, 36), 60, 36));
 
 
     let title1 = vec![
@@ -116,15 +121,38 @@ fn main_ui(f: &mut Frame, rules: &Rules) {
     f.render_widget(par, centered_rect(Rect::new(0, 6, f.size().width,  5), 30, 5));
 
 
-    let input_area = centered_rect(Rect::new(0, 12, f.size().width,  3), 30, 3);
-    let input = Paragraph::new(rules.pass_len.as_str())
-        .style(Style::default().fg(Color::Yellow))
+    let pwd_len_field_area = centered_rect(Rect::new(0, 12, f.size().width,  3), 30, 3);
+    let mut pwd_len_field = Paragraph::new(rules.pass_len.as_str())
         .block(Block::default().borders(Borders::ALL).title("Password length (4 - 10000)"));
-    f.render_widget(input, input_area);
+    pwd_len_field = if rules.field_position == "pwd_len" {
+        pwd_len_field.yellow()
+    } else {
+        pwd_len_field.white()
+    };
+    f.render_widget(pwd_len_field, pwd_len_field_area);
     f.set_cursor(
-        input_area.x + rules.cursor_position as u16 + 1,
-        input_area.y + 1,
+        pwd_len_field_area.x + rules.cursor_position as u16 + 1,
+        pwd_len_field_area.y + 1,
     );
+
+
+    for field in [
+        ("let_num_drc_free", "double readable characters free", 15),
+        ("letters", "include letters", 18),
+        ("numbs", "include numbers", 21),
+        ("spec_symbs", "include special symbols", 24),
+    ] {
+        let on_criteria = if rules.get(field.0) { "+" } else { "-" };
+        let fi_area = centered_rect(Rect::new(0, field.2, f.size().width, 3), 40, 3);
+        let mut field_par = Paragraph::new(format!(" {}   {}", on_criteria, field.1))
+            .block(Block::default().borders(Borders::ALL));
+        field_par = if rules.field_position == field.0 {
+            field_par.yellow()
+        } else {
+            field_par.white()
+        };
+        f.render_widget(field_par, fi_area);
+    }
 
 
     if rules.pwd != "" {
@@ -143,7 +171,7 @@ fn main_ui(f: &mut Frame, rules: &Rules) {
             )
             .black().on_white()
             .alignment(Alignment::Center);
-        f.render_widget(par, centered_rect(Rect::new(0, 40, f.size().width, 6), 45, 6));
+        f.render_widget(par, centered_rect(Rect::new(0, 28, f.size().width, 6), 45, 6));
     }
 }
 
