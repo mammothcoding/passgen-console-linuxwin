@@ -1,8 +1,8 @@
 pub mod generator {
-    use std::process::{Command, Stdio};
     use arboard::Clipboard;
+    use std::process::{Command, Stdio};
 
-    const CIRCUITED_FIELDS: [&str;5] = [
+    const CIRCUITED_FIELDS: [&str; 5] = [
         "pwd_len",
         "letters",
         "numbs",
@@ -41,7 +41,7 @@ pub mod generator {
                 "numbs" => self.numbs.clone(),
                 "spec_symbs" => self.spec_symbs.clone(),
                 "let_num_drc_free" => self.let_num_drc_free.clone(),
-                _ => true
+                _ => true,
             }
         }
 
@@ -69,11 +69,10 @@ pub mod generator {
             if &new_char == &' ' {
                 if self.field_position != "pwd_len" {
                     let cur_status = self.get(&self.field_position).clone();
-                    self.set(&self.field_position.clone(), if cur_status {
-                        false
-                    } else {
-                        true
-                    });
+                    self.set(
+                        &self.field_position.clone(),
+                        if cur_status { false } else { true },
+                    );
                 };
             } else {
                 self.pass_len.insert(self.cursor_position, new_char);
@@ -114,26 +113,12 @@ pub mod generator {
             self.cursor_position = self.pass_len.len();
         }
 
-        pub fn submit_to_pwd(&mut self) {
-            self.pwd = self.generate_pass();
-
-            if cfg!(unix) {
-                let mut pipe = Command::new("echo").arg("-n").arg(self.pwd.clone()).stdout(Stdio::piped()).spawn().unwrap();
-                let pipe_out = pipe.stdout.take().expect("Failed to take pipe stdout");
-                let mut out = Command::new("xclip").arg("-selection").arg("clipboard").stdin(pipe_out).spawn().unwrap();
-                out.wait().expect("Failed to run xclip");
-            } else {
-                let mut clipboard = Clipboard::new().unwrap();
-                clipboard.set_text(self.pwd.clone()).expect("Copy to clipboard error");
-            }
-
-            //self.pass_len.clear();
-            //self.reset_cursor();
-        }
-
         pub fn circ_cursor(&mut self) {
             let circ_last_idx = CIRCUITED_FIELDS.len() - 1;
-            let cur_index = CIRCUITED_FIELDS.iter().position(|&r| &r == &self.field_position).unwrap();
+            let cur_index = CIRCUITED_FIELDS
+                .iter()
+                .position(|&r| &r == &self.field_position)
+                .unwrap();
             if cur_index < circ_last_idx {
                 self.field_position = CIRCUITED_FIELDS[cur_index + 1].to_string();
             } else {
@@ -143,12 +128,70 @@ pub mod generator {
 
         pub fn up_cursor(&mut self) {
             let circ_last_idx = CIRCUITED_FIELDS.len() - 1;
-            let cur_index = CIRCUITED_FIELDS.iter().position(|&r| &r == &self.field_position).unwrap();
+            let cur_index = CIRCUITED_FIELDS
+                .iter()
+                .position(|&r| &r == &self.field_position)
+                .unwrap();
             if cur_index > 0 {
                 self.field_position = CIRCUITED_FIELDS[cur_index - 1].to_string();
             } else {
                 self.field_position = CIRCUITED_FIELDS[circ_last_idx].to_string();
             }
         }
+
+        pub fn submit_to_pwd(&mut self) {
+            if validate_pass_len(self) {
+                self.pwd = self.generate_pass();
+                if cfg!(unix) {
+                    let mut pipe = Command::new("echo")
+                        .arg("-n")
+                        .arg(self.pwd.clone())
+                        .stdout(Stdio::piped())
+                        .spawn()
+                        .unwrap();
+                    let pipe_out = pipe.stdout.take().expect("Failed to take pipe stdout");
+                    let mut out = Command::new("xclip")
+                        .arg("-selection")
+                        .arg("clipboard")
+                        .stdin(pipe_out)
+                        .spawn()
+                        .unwrap();
+                    out.wait().expect("Failed to run xclip");
+                } else {
+                    let mut clipboard = Clipboard::new().unwrap();
+                    clipboard
+                        .set_text(self.pwd.clone())
+                        .expect("Copy to clipboard error");
+                }
+            } else {
+                self.cursor_position = 1;
+                self.field_position = "pwd_len".parse().unwrap();
+                self.pass_len = "8".parse().unwrap();
+            }
+
+            //self.pass_len.clear();
+            //self.reset_cursor();
+        }
+    }
+
+    fn validate_pass_len(gen: &Generator) -> bool {
+        let parse_res = gen.pass_len.parse::<u32>();
+        match parse_res {
+            Ok(val) => if val < 4 {
+                false
+            } else if val > 10000 {
+                false
+            } else {
+                true
+            },
+            Err(_err) => false
+        }
+
+
+        /*if let Err(_err) = parse_res {
+            false
+        } else {
+            true
+        }*/
     }
 }

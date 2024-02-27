@@ -1,6 +1,6 @@
 pub mod gen_engine {
-    use rand::Rng;
     use crate::generator::generator::Generator;
+    use rand::Rng;
 
     const LETTERS_CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ\
                             abcdefghijklmnopqrstuvwxyz";
