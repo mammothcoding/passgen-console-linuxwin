@@ -32,13 +32,40 @@ pub mod gen_engine {
             }
 
             let pass_charset: Vec<u8> = pass_assembly.into_iter().flatten().cloned().collect();
-            //println!("Pass_charset is:\n{:?}", pass_charset);
-
-            (0..self.pass_len.parse::<u32>().unwrap())
+            (0..self.pwd_len.parse::<u32>().unwrap())
                 .map(|_| pass_charset[rng.gen_range(0..pass_charset.len())] as char)
                 .collect()
+        }
 
-            //println!("Password is: {:?}", password);
+        pub fn is_valid_pwd_by_consist(&self, pass: String) -> bool {
+            let pwd_in_bytes = pass.clone().into_bytes();
+
+            let check_to_available_for = |symbols: &[u8]| -> bool {
+                let mut res = false;
+                for ch in &pwd_in_bytes {
+                    if symbols.contains(&ch) {
+                        res = true;
+                    }
+                }
+                res
+            };
+
+            if self.letters || self.let_num_drc_free {
+                if !check_to_available_for(LETTERS_CHARSET) {
+                    return false;
+                }
+            }
+            if self.numbs || self.let_num_drc_free {
+                if !check_to_available_for(NUMBERS_CHARSET) {
+                    return false;
+                }
+            }
+            if self.spec_symbs {
+                if !check_to_available_for(SPEC_SYMB_CHARSET) {
+                    return false;
+                }
+            }
+            true
         }
     }
 }

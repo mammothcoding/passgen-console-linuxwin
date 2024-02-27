@@ -17,7 +17,9 @@ pub mod generator {
         pub let_num_drc_free: bool,
         pub cursor_position: usize,
         pub field_position: String,
-        pub pass_len: String,
+        pub pwd_len: String,
+        pub min_pwd_len: u32,
+        pub max_pwd_len: u32,
         pub pwd: String,
     }
 
@@ -30,7 +32,9 @@ pub mod generator {
                 let_num_drc_free: true,
                 cursor_position: 1,
                 field_position: "pwd_len".parse().unwrap(),
-                pass_len: "8".parse().unwrap(),
+                pwd_len: "8".parse().unwrap(),
+                min_pwd_len: 4,
+                max_pwd_len: 10000,
                 pwd: "".parse().unwrap(),
             }
         }
@@ -75,7 +79,7 @@ pub mod generator {
                     );
                 };
             } else {
-                self.pass_len.insert(self.cursor_position, new_char);
+                self.pwd_len.insert(self.cursor_position, new_char);
                 self.move_cursor_right();
             };
         }
@@ -84,25 +88,25 @@ pub mod generator {
             let is_not_cursor_leftmost = self.cursor_position != 0;
             if is_not_cursor_leftmost {
                 let current_index = self.cursor_position;
-                let before_char_to_delete = self.pass_len.chars().take(current_index - 1);
-                let after_char_to_delete = self.pass_len.chars().skip(current_index);
-                self.pass_len = before_char_to_delete.chain(after_char_to_delete).collect();
+                let before_char_to_delete = self.pwd_len.chars().take(current_index - 1);
+                let after_char_to_delete = self.pwd_len.chars().skip(current_index);
+                self.pwd_len = before_char_to_delete.chain(after_char_to_delete).collect();
                 self.move_cursor_left();
             }
         }
 
         pub fn delete_char(&mut self) {
-            let is_not_cursor_rightmost = self.cursor_position != self.pass_len.parse().unwrap();
+            let is_not_cursor_rightmost = self.cursor_position != self.pwd_len.parse().unwrap();
             if is_not_cursor_rightmost {
                 let current_index = self.cursor_position;
-                let before_char_to_delete = self.pass_len.chars().take(current_index);
-                let after_char_to_delete = self.pass_len.chars().skip(current_index + 1);
-                self.pass_len = before_char_to_delete.chain(after_char_to_delete).collect();
+                let before_char_to_delete = self.pwd_len.chars().take(current_index);
+                let after_char_to_delete = self.pwd_len.chars().skip(current_index + 1);
+                self.pwd_len = before_char_to_delete.chain(after_char_to_delete).collect();
             }
         }
 
         pub fn clamp_cursor(&self, new_cursor_pos: usize) -> usize {
-            new_cursor_pos.clamp(0, self.pass_len.len())
+            new_cursor_pos.clamp(0, self.pwd_len.len())
         }
 
         pub fn reset_cursor(&mut self) {
@@ -110,7 +114,7 @@ pub mod generator {
         }
 
         pub fn cursor_to_end(&mut self) {
-            self.cursor_position = self.pass_len.len();
+            self.cursor_position = self.pwd_len.len();
         }
 
         pub fn circ_cursor(&mut self) {
@@ -140,9 +144,15 @@ pub mod generator {
         }
 
         pub fn submit_to_pwd(&mut self) {
-            if validate_pass_len(self) {
-                self.pwd = self.generate_pass();
-                if cfg!(unix) {
+            if self.is_valid_user_input() {
+
+                let mut pwd = self.generate_pass();
+                while !self.is_valid_pwd_by_consist(pwd.clone()) {
+                    pwd = self.generate_pass();
+                }
+                self.pwd = pwd;
+
+                    if cfg!(unix) {
                     let mut pipe = Command::new("echo")
                         .arg("-n")
                         .arg(self.pwd.clone())
@@ -166,32 +176,23 @@ pub mod generator {
             } else {
                 self.cursor_position = 1;
                 self.field_position = "pwd_len".parse().unwrap();
-                self.pass_len = "8".parse().unwrap();
+                self.pwd_len = "8".parse().unwrap();
             }
 
-            //self.pass_len.clear();
+            //self.pwd_len.clear();
             //self.reset_cursor();
         }
-    }
 
-    fn validate_pass_len(gen: &Generator) -> bool {
-        let parse_res = gen.pass_len.parse::<u32>();
-        match parse_res {
-            Ok(val) => if val < 4 {
-                false
-            } else if val > 10000 {
-                false
-            } else {
-                true
-            },
-            Err(_err) => false
+        fn is_valid_user_input(&self) -> bool {
+            let parse_res = self.pwd_len.parse::<u32>();
+            match parse_res {
+                Ok(val) => if val < self.min_pwd_len || val > self.max_pwd_len {
+                    false
+                } else {
+                    true
+                },
+                Err(_err) => false
+            }
         }
-
-
-        /*if let Err(_err) = parse_res {
-            false
-        } else {
-            true
-        }*/
     }
 }

@@ -62,10 +62,10 @@ pub mod ui {
         );
 
         let pwd_len_field_area = centered_rect(Rect::new(0, 12, f.size().width, 3), 30, 3);
-        let mut pwd_len_field = Paragraph::new(generator.pass_len.as_str()).block(
+        let mut pwd_len_field = Paragraph::new(generator.pwd_len.as_str()).block(
             Block::default()
                 .borders(Borders::ALL)
-                .title("Password length (4 - 10000)"),
+                .title(format!("Password length ({} - {})", generator.min_pwd_len, generator.max_pwd_len)),
         );
         pwd_len_field = if generator.field_position == "pwd_len" {
             pwd_len_field.yellow()
@@ -82,7 +82,7 @@ pub mod ui {
             ("letters", "include letters", 15),
             ("numbs", "include numbers", 18),
             ("spec_symbs", "include special symbols", 21),
-            ("let_num_drc_free", "exclude \"0oOiIlL1\" symbols", 24),
+            ("let_num_drc_free", "num&let exclude \"0oOiIlL1\"", 24),
         ] {
             let on_criteria = if generator.get(field.0) { "+" } else { "-" };
             let fi_area = centered_rect(Rect::new(0, field.2, f.size().width, 3), 40, 3);
