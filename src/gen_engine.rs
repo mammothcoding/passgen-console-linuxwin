@@ -2,8 +2,8 @@ pub mod gen_engine {
     use crate::generator::generator::Generator;
     use rand::Rng;
 
-    const LETTERS_CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ\
-                            abcdefghijklmnopqrstuvwxyz";
+    const LETTERS_CHARSET: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
+    const U_LETTERS_CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const NUMBERS_CHARSET: &[u8] = b"0123456789";
     const SPEC_SYMB_CHARSET: &[u8] = b")([]{}*&^%$#@!~";
     const LET_NUM_DRC_FREE: &[u8] = b"ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz\
@@ -22,6 +22,9 @@ pub mod gen_engine {
             } else {
                 if self.letters {
                     pass_assembly.push(LETTERS_CHARSET);
+                }
+                if self.u_letters {
+                    pass_assembly.push(U_LETTERS_CHARSET);
                 }
                 if self.numbs {
                     pass_assembly.push(NUMBERS_CHARSET);
@@ -45,6 +48,7 @@ pub mod gen_engine {
                 for ch in &pwd_in_bytes {
                     if symbols.contains(&ch) {
                         res = true;
+                        break;
                     }
                 }
                 res
@@ -52,6 +56,11 @@ pub mod gen_engine {
 
             if self.letters || self.let_num_drc_free {
                 if !check_to_available_for(LETTERS_CHARSET) {
+                    return false;
+                }
+            }
+            if self.u_letters || self.let_num_drc_free {
+                if !check_to_available_for(U_LETTERS_CHARSET) {
                     return false;
                 }
             }

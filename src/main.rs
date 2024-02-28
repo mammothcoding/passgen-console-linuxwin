@@ -44,6 +44,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut generator: Generator) -> 
                     KeyCode::Esc => {
                         return Ok(());
                     }
+                    KeyCode::F(9) => {
+                        generator.switch_lang();
+                    }
                     KeyCode::Enter => {
                         generator.submit_to_pwd();
                     }
