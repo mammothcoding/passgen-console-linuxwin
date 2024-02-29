@@ -1,10 +1,10 @@
 pub mod ui {
     use crate::generator::generator::Generator;
+    use ratatui::layout::Alignment::Center;
     use ratatui::layout::{Alignment, Flex, Layout, Rect};
     use ratatui::prelude::{Line, Modifier, Span, Style, Stylize};
     use ratatui::widgets::{Block, BorderType, Borders, Paragraph};
     use ratatui::Frame;
-    use ratatui::layout::Alignment::Center;
 
     pub fn draw_ui(f: &mut Frame, generator: &Generator) {
         if f.size().height < 40 {
@@ -125,16 +125,19 @@ pub mod ui {
             // Password length input area
             let pwd_len_field_area = centered_rect(Rect::new(0, 11, f.size().width, 3), 44, 3);
             let mut pwd_len_field = Paragraph::new(generator.pwd_len.as_str()).block(
-                Block::default().borders(Borders::ALL).title(format!(
-                    "{} ({} - {})",
-                    if generator.lang.as_str() == "en" {
-                        "Password length"
-                    } else {
-                        "Длина пароля"
-                    },
-                    generator.min_pwd_len,
-                    generator.max_pwd_len
-                )).title_alignment(Center),
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(format!(
+                        "{} ({} - {})",
+                        if generator.lang.as_str() == "en" {
+                            "Password length"
+                        } else {
+                            "Длина пароля"
+                        },
+                        generator.min_pwd_len,
+                        generator.max_pwd_len
+                    ))
+                    .title_alignment(Center),
             );
             pwd_len_field = if generator.field_position == "pwd_len" {
                 pwd_len_field.yellow()
