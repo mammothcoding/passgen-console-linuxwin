@@ -238,7 +238,7 @@ pub mod ui {
                     .alignment(Alignment::Center);
                 f.render_widget(
                     par,
-                    centered_rect(Rect::new(0, 30, f.size().width, 6), 45, 6),
+                    centered_rect(Rect::new(0, 30, f.size().width, 6), 55, 6),
                 );
             }
 
