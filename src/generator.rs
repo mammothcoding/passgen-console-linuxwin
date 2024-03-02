@@ -24,7 +24,7 @@ pub mod generator {
         pub max_pwd_len: u32,
         pub pwd: String,
         pub lang: String,
-        pub errors: (),
+        pub errors: Vec<String>,
     }
 
     impl Generator {
@@ -42,7 +42,7 @@ pub mod generator {
                 max_pwd_len: 10000,
                 pwd: "".to_string(),
                 lang: "en".to_string(),
-                errors: (),
+                errors: Vec::new(),
             }
         }
 
@@ -180,12 +180,14 @@ pub mod generator {
                         .arg("-selection")
                         .arg("clipboard")
                         .stdin(pipe_out)
-                        .spawn()
-                        .unwrap_or_else({
-                            self.errors.0 = "\'xclip\' packet needed for copy to clipbord!";
-                            self.errors.1 = "Для вставки в буфер обмена установите пакет \'xclip\'!";
-                        });
-                    out.wait().expect("Failed to run xclip");
+                        .spawn();
+                    if let Err(_err) = &out {
+                        self.errors.push("\'xclip\' packet needed for copy to clipbord!".to_string());
+                        self.errors.push("Для вставки в буфер обмена установите пакет \'xclip\'!".to_string())
+                    } else {
+                        out.unwrap().wait().expect("Failed to run xclip");
+                    }
+
                 } else {
                     let mut clipboard = Clipboard::new().unwrap();
                     clipboard
