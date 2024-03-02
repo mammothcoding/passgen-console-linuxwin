@@ -24,7 +24,7 @@ pub mod generator {
         pub max_pwd_len: u32,
         pub pwd: String,
         pub lang: String,
-        pub errors: Vec<String>,
+        pub errors: (String, String),
     }
 
     impl Generator {
@@ -42,7 +42,7 @@ pub mod generator {
                 max_pwd_len: 10000,
                 pwd: "".to_string(),
                 lang: "en".to_string(),
-                errors: Vec::new(),
+                errors: ("".to_string(), "".to_string()),
             }
         }
 
@@ -169,30 +169,59 @@ pub mod generator {
                 self.pwd = pwd;
 
                 if cfg!(unix) {
-                    let mut pipe = Command::new("echo")
+                    let pipe = Command::new("echo")
                         .arg("-n")
                         .arg(self.pwd.clone())
                         .stdout(Stdio::piped())
-                        .spawn()
-                        .unwrap();
-                    let pipe_out = pipe.stdout.take().expect("Failed to take pipe stdout");
-                    let mut out = Command::new("xclip")
-                        .arg("-selection")
-                        .arg("clipboard")
-                        .stdin(pipe_out)
                         .spawn();
-                    if let Err(_err) = &out {
-                        self.errors.push("\'xclip\' packet needed for copy to clipbord!".to_string());
-                        self.errors.push("Для вставки в буфер обмена установите пакет \'xclip\'!".to_string())
+                    if let Err(_err) = &pipe {
+                        self.errors = (
+                            "echo error by copy to clipbord!".to_string(),
+                            "При вставке в буфер обмена произошла ошибка echo!".to_string(),
+                        );
                     } else {
-                        out.unwrap().wait().expect("Failed to run xclip");
+                        let pipe_out = pipe.unwrap().stdout.take().expect("Failed to take pipe stdout!");
+                        let out = Command::new("xclip")
+                            .arg("-selection")
+                            .arg("clipboard")
+                            .stdin(pipe_out)
+                            .spawn();
+                        if let Err(_err) = &out {
+                            self.errors = (
+                                "\'xclip\' packet needed for copy to clipbord!".to_string(),
+                                "Для вставки в буфер обмена установите пакет \'xclip\'!".to_string(),
+                            );
+                        } else {
+                            let owait = out.unwrap().wait();
+                            if let Err(_err) = &owait {
+                                self.errors = (
+                                    "Failed to run xclip!".to_string(),
+                                    "Failed to run xclip!".to_string(),
+                                );
+                                owait.unwrap();
+                            }
+                        }
                     }
-
                 } else {
-                    let mut clipboard = Clipboard::new().unwrap();
-                    clipboard
-                        .set_text(self.pwd.clone())
-                        .expect("Copy to clipboard error");
+                    let clipboard = Clipboard::new();
+                    if let Err(_err) = &clipboard {
+                        self.errors = (
+                            "Copy to clipboard error!".to_string(),
+                            "Ошибка копирования в буфер обмена!".to_string(),
+                        );
+                    } else {
+                        let clip = clipboard
+                            .unwrap()
+                            .set_text(self.pwd.clone());
+                        if let Err(_err) = &clip {
+                            self.errors = (
+                                "Copy to clipboard error!".to_string(),
+                                "Ошибка копирования в буфер обмена!".to_string(),
+                            );
+                        } else {
+                            clip.unwrap();
+                        }
+                    }
                 }
             } else {
                 self.cursor_position = 1;

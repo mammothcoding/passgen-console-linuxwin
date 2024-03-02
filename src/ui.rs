@@ -196,29 +196,29 @@ pub mod ui {
                 pwd = format!("{}...", &pwd[..39].to_string());
             }
             if generator.pwd != "" {
-                let pwd_text = if generator.lang.as_str() == "en" {
-                    vec![
-                        Line::from(Span::raw("")),
-                        Line::from(Span::raw(pwd).bold()),
-                        Line::from(Span::raw("")),
-                        Line::from(
-                            Span::raw("this password was copied to clipboard")
-                                .italic()
-                                .on_gray(),
-                        ),
-                    ]
+                let text: String = if generator.lang.as_str() == "en" {
+                    if generator.errors.0 != "" {
+                        generator.errors.0.clone()
+                    } else {
+                        "this password was copied to clipboard".to_string()
+                    }
                 } else {
-                    vec![
-                        Line::from(Span::raw("")),
-                        Line::from(Span::raw(pwd).bold()),
-                        Line::from(Span::raw("")),
-                        Line::from(
-                            Span::raw("пароль был скопирован в буфер обмена")
-                                .italic()
-                                .on_gray(),
-                        ),
-                    ]
+                    if generator.errors.1 != "" {
+                        generator.errors.1.clone()
+                    } else {
+                        "пароль был скопирован в буфер обмена".to_string()
+                    }
                 };
+                let pwd_text = vec![
+                    Line::from(Span::raw("")),
+                    Line::from(Span::raw(pwd).bold()),
+                    Line::from(Span::raw("")),
+                    Line::from(
+                        Span::raw(text)
+                            .italic()
+                            .on_gray(),
+                    ),
+                ];
                 let pwd_title = if generator.lang.as_str() == "en" {
                     "Password is"
                 } else {
