@@ -8,7 +8,7 @@ pub mod generator {
         "u_letters",
         "numbs",
         "spec_symbs",
-        "let_num_drc_free",
+        "convenience_criterion",
     ];
 
     pub struct Generator {
@@ -16,7 +16,7 @@ pub mod generator {
         pub u_letters: bool,
         pub numbs: bool,
         pub spec_symbs: bool,
-        pub let_num_drc_free: bool,
+        pub convenience_criterion: bool,
         pub cursor_position: usize,
         pub field_position: String,
         pub pwd_len: String,
@@ -34,7 +34,7 @@ pub mod generator {
                 u_letters: false,
                 numbs: false,
                 spec_symbs: true,
-                let_num_drc_free: true,
+                convenience_criterion: true,
                 cursor_position: 1,
                 field_position: "pwd_len".to_string(),
                 pwd_len: "8".to_string(),
@@ -52,7 +52,7 @@ pub mod generator {
                 "u_letters" => self.u_letters.clone(),
                 "numbs" => self.numbs.clone(),
                 "spec_symbs" => self.spec_symbs.clone(),
-                "let_num_drc_free" => self.let_num_drc_free.clone(),
+                "convenience_criterion" => self.convenience_criterion.clone(),
                 _ => true,
             }
         }
@@ -63,7 +63,7 @@ pub mod generator {
                 "u_letters" => self.u_letters = new_val,
                 "numbs" => self.numbs = new_val,
                 "spec_symbs" => self.spec_symbs = new_val,
-                "let_num_drc_free" => self.let_num_drc_free = new_val,
+                "convenience_criterion" => self.convenience_criterion = new_val,
                 _ => {}
             }
         }

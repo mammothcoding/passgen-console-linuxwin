@@ -158,8 +158,8 @@ pub mod ui {
                     ("numbs", "include numbers", 20),
                     ("spec_symbs", "include special symbols", 23),
                     (
-                        "let_num_drc_free",
-                        "all nums & letters exclude \"0oOiIlL1\"",
+                        "convenience_criterion",
+                        "convenient password",
                         26,
                     ),
                 ]
@@ -170,8 +170,8 @@ pub mod ui {
                     ("numbs", "включая цифры", 20),
                     ("spec_symbs", "включая спец. символы", 23),
                     (
-                        "let_num_drc_free",
-                        "все буквы и цифры кроме \"0oOiIlL1\"",
+                        "convenience_criterion",
+                        "удобный пароль",
                         26,
                     ),
                 ]

@@ -5,7 +5,6 @@ pub mod ui;
 use crate::generator::generator::Generator;
 use crate::ui::ui::draw_ui;
 use crossterm::{
-    event,
     event::*,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
@@ -38,8 +37,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut generator: Generator) -> 
     loop {
         terminal.draw(|f| draw_ui(f, &generator))?;
 
-        if let Event::Key(key) = event::read()? {
-            if key.kind == event::KeyEventKind::Press {
+        if let Event::Key(key) = read()? {
+            if key.kind == KeyEventKind::Press {
                 match key.code {
                     KeyCode::Esc => {
                         return Ok(());
