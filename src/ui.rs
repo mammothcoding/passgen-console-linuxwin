@@ -159,7 +159,7 @@ pub mod ui {
                     ("spec_symbs", "include special symbols", 23),
                     (
                         "convenience_criterion",
-                        "convenient password",
+                        "strong & usability password",
                         26,
                     ),
                 ]
@@ -171,7 +171,7 @@ pub mod ui {
                     ("spec_symbs", "включая спец. символы", 23),
                     (
                         "convenience_criterion",
-                        "удобный пароль",
+                        "сильный и удобный пароль",
                         26,
                     ),
                 ]
