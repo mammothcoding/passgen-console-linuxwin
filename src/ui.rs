@@ -139,7 +139,7 @@ pub mod ui {
                     ))
                     .title_alignment(Center),
             );
-            pwd_len_field = if generator.field_position == "pwd_len" {
+            pwd_len_field = if generator.rule_position == "pwd_len" {
                 pwd_len_field.yellow()
             } else {
                 pwd_len_field.white()
@@ -178,11 +178,11 @@ pub mod ui {
             };
 
             for field in fields {
-                let on_criteria = if generator.get(field.0) { "+" } else { "-" };
+                let on_criteria = if generator.get_rule_state(field.0) { "+" } else { "-" };
                 let fi_area = centered_rect(Rect::new(0, field.2, f.size().width, 3), 44, 3);
                 let mut field_par = Paragraph::new(format!(" {}   {}", on_criteria, field.1))
                     .block(Block::default().borders(Borders::ALL));
-                field_par = if generator.field_position == field.0 {
+                field_par = if generator.rule_position == field.0 {
                     field_par.yellow()
                 } else {
                     field_par.white()
@@ -243,10 +243,11 @@ pub mod ui {
             }
 
             // Footer
+            let ver = env!("CARGO_PKG_VERSION");
             let footer = if generator.lang.as_str() == "en" {
-                "Made with RUST | 2024 | https://github.com/mammothcoding"
+                format!("Dev on Rust | v{ver} | 2024 | https://passgen.mamont.xyz")
             } else {
-                "Создано на языке RUST | 2024 | https://github.com/mammothcoding"
+                format!("Создано на языке Rust | v{ver} | 2024 | https://passgen.mamont.xyz")
             };
             let par = Paragraph::new(footer)
                 .block(Block::default().borders(Borders::TOP).gray().on_black())

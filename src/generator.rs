@@ -18,7 +18,7 @@ pub mod generator {
         pub spec_symbs: bool,
         pub convenience_criterion: bool,
         pub cursor_position: usize,
-        pub field_position: String,
+        pub rule_position: String,
         pub pwd_len: String,
         pub min_pwd_len: u32,
         pub max_pwd_len: u32,
@@ -36,7 +36,7 @@ pub mod generator {
                 spec_symbs: true,
                 convenience_criterion: true,
                 cursor_position: 1,
-                field_position: "pwd_len".to_string(),
+                rule_position: "pwd_len".to_string(),
                 pwd_len: "8".to_string(),
                 min_pwd_len: 4,
                 max_pwd_len: 10000,
@@ -46,8 +46,8 @@ pub mod generator {
             }
         }
 
-        pub fn get(&self, field_string: &str) -> bool {
-            match field_string {
+        pub fn get_rule_state(&self, rule_name: &str) -> bool {
+            match rule_name {
                 "letters" => self.letters.clone(),
                 "u_letters" => self.u_letters.clone(),
                 "numbs" => self.numbs.clone(),
@@ -57,8 +57,8 @@ pub mod generator {
             }
         }
 
-        pub fn set(&mut self, field_string: &str, new_val: bool) {
-            match field_string {
+        pub fn set_rule_state(&mut self, rule_name: &str, new_val: bool) {
+            match rule_name {
                 "letters" => self.letters = new_val,
                 "u_letters" => self.u_letters = new_val,
                 "numbs" => self.numbs = new_val,
@@ -88,10 +88,10 @@ pub mod generator {
 
         pub fn enter_char(&mut self, new_char: char) {
             if &new_char == &' ' {
-                if self.field_position != "pwd_len" {
-                    let cur_status = self.get(&self.field_position).clone();
-                    self.set(
-                        &self.field_position.clone(),
+                if self.rule_position != "pwd_len" {
+                    let cur_status = self.get_rule_state(&self.rule_position).clone();
+                    self.set_rule_state(
+                        &self.rule_position.clone(),
                         if cur_status { false } else { true },
                     );
                 };
@@ -138,12 +138,12 @@ pub mod generator {
             let circ_last_idx = CIRCUITED_FIELDS.len() - 1;
             let cur_index = CIRCUITED_FIELDS
                 .iter()
-                .position(|&r| &r == &self.field_position)
+                .position(|&r| &r == &self.rule_position)
                 .unwrap();
             if cur_index < circ_last_idx {
-                self.field_position = CIRCUITED_FIELDS[cur_index + 1].to_string();
+                self.rule_position = CIRCUITED_FIELDS[cur_index + 1].to_string();
             } else {
-                self.field_position = CIRCUITED_FIELDS[0].to_string();
+                self.rule_position = CIRCUITED_FIELDS[0].to_string();
             }
         }
 
@@ -151,12 +151,12 @@ pub mod generator {
             let circ_last_idx = CIRCUITED_FIELDS.len() - 1;
             let cur_index = CIRCUITED_FIELDS
                 .iter()
-                .position(|&r| &r == &self.field_position)
+                .position(|&r| &r == &self.rule_position)
                 .unwrap();
             if cur_index > 0 {
-                self.field_position = CIRCUITED_FIELDS[cur_index - 1].to_string();
+                self.rule_position = CIRCUITED_FIELDS[cur_index - 1].to_string();
             } else {
-                self.field_position = CIRCUITED_FIELDS[circ_last_idx].to_string();
+                self.rule_position = CIRCUITED_FIELDS[circ_last_idx].to_string();
             }
         }
 
@@ -225,7 +225,7 @@ pub mod generator {
                 }
             } else {
                 self.cursor_position = 1;
-                self.field_position = "pwd_len".parse().unwrap();
+                self.rule_position = "pwd_len".parse().unwrap();
                 self.pwd_len = "8".parse().unwrap();
             }
 
