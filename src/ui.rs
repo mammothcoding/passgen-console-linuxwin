@@ -139,7 +139,7 @@ pub mod ui {
                     ))
                     .title_alignment(Center),
             );
-            pwd_len_field = if generator.rule_position == "pwd_len" {
+            pwd_len_field = if generator.rules_position == "pwd_len" {
                 pwd_len_field.yellow()
             } else {
                 pwd_len_field.white()
@@ -157,11 +157,7 @@ pub mod ui {
                     ("u_letters", "include capital letters", 17),
                     ("numbs", "include numbers", 20),
                     ("spec_symbs", "include special symbols", 23),
-                    (
-                        "convenience_criterion",
-                        "strong & usability password",
-                        26,
-                    ),
+                    ("convenience_criterion", "strong & usability password", 26),
                 ]
             } else {
                 [
@@ -169,20 +165,20 @@ pub mod ui {
                     ("u_letters", "включая большие буквы", 17),
                     ("numbs", "включая цифры", 20),
                     ("spec_symbs", "включая спец. символы", 23),
-                    (
-                        "convenience_criterion",
-                        "сильный и удобный пароль",
-                        26,
-                    ),
+                    ("convenience_criterion", "сильный и удобный пароль", 26),
                 ]
             };
 
             for field in fields {
-                let on_criteria = if generator.get_rule_state(field.0) { "+" } else { "-" };
+                let on_criteria = if generator.get_rule_state(field.0) {
+                    "+"
+                } else {
+                    "-"
+                };
                 let fi_area = centered_rect(Rect::new(0, field.2, f.size().width, 3), 44, 3);
                 let mut field_par = Paragraph::new(format!(" {}   {}", on_criteria, field.1))
                     .block(Block::default().borders(Borders::ALL));
-                field_par = if generator.rule_position == field.0 {
+                field_par = if generator.rules_position == field.0 {
                     field_par.yellow()
                 } else {
                     field_par.white()
@@ -213,11 +209,7 @@ pub mod ui {
                     Line::from(Span::raw("")),
                     Line::from(Span::raw(pwd).bold()),
                     Line::from(Span::raw("")),
-                    Line::from(
-                        Span::raw(text)
-                            .italic()
-                            .on_gray(),
-                    ),
+                    Line::from(Span::raw(text).italic().on_gray()),
                 ];
                 let pwd_title = if generator.lang.as_str() == "en" {
                     "Password is"

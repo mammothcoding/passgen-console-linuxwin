@@ -18,7 +18,7 @@ pub mod generator {
         pub spec_symbs: bool,
         pub convenience_criterion: bool,
         pub cursor_position: usize,
-        pub rule_position: String,
+        pub rules_position: String,
         pub pwd_len: String,
         pub min_pwd_len: u32,
         pub max_pwd_len: u32,
@@ -36,7 +36,7 @@ pub mod generator {
                 spec_symbs: true,
                 convenience_criterion: true,
                 cursor_position: 1,
-                rule_position: "pwd_len".to_string(),
+                rules_position: "pwd_len".to_string(),
                 pwd_len: "8".to_string(),
                 min_pwd_len: 4,
                 max_pwd_len: 10000,
@@ -88,10 +88,10 @@ pub mod generator {
 
         pub fn enter_char(&mut self, new_char: char) {
             if &new_char == &' ' {
-                if self.rule_position != "pwd_len" {
-                    let cur_status = self.get_rule_state(&self.rule_position).clone();
+                if self.rules_position != "pwd_len" {
+                    let cur_status = self.get_rule_state(&self.rules_position).clone();
                     self.set_rule_state(
-                        &self.rule_position.clone(),
+                        &self.rules_position.clone(),
                         if cur_status { false } else { true },
                     );
                 };
@@ -138,12 +138,12 @@ pub mod generator {
             let circ_last_idx = CIRCUITED_FIELDS.len() - 1;
             let cur_index = CIRCUITED_FIELDS
                 .iter()
-                .position(|&r| &r == &self.rule_position)
+                .position(|&r| &r == &self.rules_position)
                 .unwrap();
             if cur_index < circ_last_idx {
-                self.rule_position = CIRCUITED_FIELDS[cur_index + 1].to_string();
+                self.rules_position = CIRCUITED_FIELDS[cur_index + 1].to_string();
             } else {
-                self.rule_position = CIRCUITED_FIELDS[0].to_string();
+                self.rules_position = CIRCUITED_FIELDS[0].to_string();
             }
         }
 
@@ -151,12 +151,12 @@ pub mod generator {
             let circ_last_idx = CIRCUITED_FIELDS.len() - 1;
             let cur_index = CIRCUITED_FIELDS
                 .iter()
-                .position(|&r| &r == &self.rule_position)
+                .position(|&r| &r == &self.rules_position)
                 .unwrap();
             if cur_index > 0 {
-                self.rule_position = CIRCUITED_FIELDS[cur_index - 1].to_string();
+                self.rules_position = CIRCUITED_FIELDS[cur_index - 1].to_string();
             } else {
-                self.rule_position = CIRCUITED_FIELDS[circ_last_idx].to_string();
+                self.rules_position = CIRCUITED_FIELDS[circ_last_idx].to_string();
             }
         }
 
@@ -180,7 +180,11 @@ pub mod generator {
                             "При вставке в буфер обмена произошла ошибка echo!".to_string(),
                         );
                     } else {
-                        let pipe_out = pipe.unwrap().stdout.take().expect("Failed to take pipe stdout!");
+                        let pipe_out = pipe
+                            .unwrap()
+                            .stdout
+                            .take()
+                            .expect("Failed to take pipe stdout!");
                         let out = Command::new("xclip")
                             .arg("-selection")
                             .arg("clipboard")
@@ -189,7 +193,8 @@ pub mod generator {
                         if let Err(_err) = &out {
                             self.errors = (
                                 "\'xclip\' packet needed for copy to clipbord!".to_string(),
-                                "Для вставки в буфер обмена установите пакет \'xclip\'!".to_string(),
+                                "Для вставки в буфер обмена установите пакет \'xclip\'!"
+                                    .to_string(),
                             );
                         } else {
                             let owait = out.unwrap().wait();
@@ -210,9 +215,7 @@ pub mod generator {
                             "Ошибка копирования в буфер обмена!".to_string(),
                         );
                     } else {
-                        let clip = clipboard
-                            .unwrap()
-                            .set_text(self.pwd.clone());
+                        let clip = clipboard.unwrap().set_text(self.pwd.clone());
                         if let Err(_err) = &clip {
                             self.errors = (
                                 "Copy to clipboard error!".to_string(),
@@ -225,7 +228,7 @@ pub mod generator {
                 }
             } else {
                 self.cursor_position = 1;
-                self.rule_position = "pwd_len".parse().unwrap();
+                self.rules_position = "pwd_len".parse().unwrap();
                 self.pwd_len = "8".parse().unwrap();
             }
 
