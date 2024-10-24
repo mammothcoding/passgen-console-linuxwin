@@ -2,6 +2,9 @@
 name = "passgen-console-linuxwin"
 version = "1.2.0"
 edition = "2021"
+license = "MIT"
+description = "A simple password generator."
+authors = ["Mamontov Konstantin <k@mamont.xyz>"]
 build = "build.rs"
 
 [dependencies]
