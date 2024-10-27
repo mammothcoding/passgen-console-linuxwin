@@ -8,7 +8,8 @@ pub mod gen_engine {
     const SPEC_SYMB_CHARSET: &[u8] = b")([]{}*&^%$#@!~";
     const SIMP_SYMB_CHARSET: &[u8] = b"*&%$#@!"; // set without inconvenient symbols / набор без неудобных символов
     const CONVENIENT_CHARSET: &[u8] = b"ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz\
-                            23456789"; // set without ambiguous and inconvenient letters / набор без двоякочитаемых и неудобных букв
+                            23456789"; // set without ambiguous and inconvenient letters with numbers / набор без двоякочитаемых и неудобных букв с цифрами
+    const CONVENIENT_LETTERS_CHARSET: &[u8] = b"ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz"; // set without ambiguous and inconvenient letters with numbers / набор без двоякочитаемых и неудобных букв с цифрами
 
     impl Generator {
         pub fn generate_pass(&mut self) -> String {
@@ -40,11 +41,7 @@ pub mod gen_engine {
             let pass_processing_len: u32 = self.pwd_len.parse::<u32>().unwrap();
 
             if self.convenience_criterion {
-                let mut letters_set: Vec<&[u8]> = Vec::new();
-                letters_set.push(LETTERS_CHARSET);
-                letters_set.push(U_LETTERS_CHARSET);
-                let letters_charset: Vec<u8> = letters_set.into_iter().flatten().cloned().collect();
-
+                let letters_charset: Vec<u8> = CONVENIENT_LETTERS_CHARSET.into_iter().cloned().collect();
                 let simp_symb_charset: Vec<u8> = SIMP_SYMB_CHARSET.into_iter().cloned().collect();
 
                 // gen first pass symbol from all letters

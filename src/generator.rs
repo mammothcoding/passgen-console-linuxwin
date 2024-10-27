@@ -33,7 +33,7 @@ pub mod generator {
                 letters: false,
                 u_letters: false,
                 numbs: false,
-                spec_symbs: true,
+                spec_symbs: false,
                 convenience_criterion: true,
                 cursor_position: 1,
                 rules_position: "pwd_len".to_string(),
