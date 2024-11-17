@@ -2,10 +2,17 @@
 name = "passgen-console-linuxwin"
 version = "1.2.1"
 edition = "2021"
+rust-version = "1.82"
 license = "MIT"
 description = "A simple password generator."
+readme = "README.md"
 authors = ["Mamontov Konstantin <k@mamont.xyz>"]
 build = "build.rs"
+homepage = "https://github.com/mammothcoding/passgen-console-linuxwin"
+repository = "https://github.com/mammothcoding/passgen-console-linuxwin"
+keywords = ["password", "generator", "ratatui", "windows", "linux"]
+categories = ["authentication", "command-line-utilities"]
+exclude = [".*"]
 
 [dependencies]
 ratatui = "*"
