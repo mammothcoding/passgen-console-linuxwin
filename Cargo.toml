@@ -15,9 +15,9 @@ categories = ["authentication", "command-line-utilities"]
 exclude = [".*"]
 
 [dependencies]
-ratatui = "*"
-crossterm = "*"
-arboard = "*"
+ratatui = "0.26.1"
+crossterm = "0.27.0"
+arboard = "3.3.1"
 unicode-width = "0.1.11"
 rand = "0.9.0-alpha.0"
 
