@@ -4,6 +4,7 @@
 [![Download](https://img.shields.io/crates/d/passgen-console-linuxwin.svg)](https://crates.io/crates/passgen-console-linuxwin)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 [![Build Status](https://github.com/mammothcoding/passgen-console-linuxwin/actions/workflows/rust.yml/badge.svg?event=push)](https://github.com/mammothcoding/passgen-console-linuxwin/actions/workflows/rust.yml)
+[![made-with-rust](https://img.shields.io/badge/Made%20with-Rust-1f425f.svg)](https://www.rust-lang.org/)
 
 # passgen-console-linuxwin
 
