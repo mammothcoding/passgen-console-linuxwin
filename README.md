@@ -9,6 +9,7 @@
 # 🔏 Passgen-console-linuxwin
 
 Cross-platform console-gui-tool for generating cryptographically secure passwords/tokens and other sets and sequences.
+
 [CSPRNGs](https://rust-random.github.io/book/guide-rngs.html#cryptographically-secure-pseudo-random-number-generators-csprngs) Isaac64Rng and Hc128Rng are used.
 
 ![alt text](./App_screen.png "passgen-console-linuxwin")
