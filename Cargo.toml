@@ -1,10 +1,10 @@
 [package]
 name = "passgen-console-linuxwin"
-version = "1.2.1"
+version = "1.3.0"
 edition = "2021"
-rust-version = "1.82"
+rust-version = "1.83"
 license = "MIT"
-description = "A simple password generator."
+description = "Cross-platform console-gui-tool for generating cryptographically secure passwords/tokens and other sets and sequences."
 readme = "README.md"
 authors = ["Mamontov Konstantin <k@mamont.xyz>"]
 build = "build.rs"
@@ -15,11 +15,14 @@ categories = ["authentication", "command-line-utilities"]
 exclude = [".*"]
 
 [dependencies]
-ratatui = "0.26.1"
-crossterm = "0.27.0"
+ratatui = "0.29.0"
+crossterm = "0.28.1"
 arboard = "3.3.1"
-unicode-width = "0.1.11"
-rand = "0.9.0-alpha.0"
+unicode-width = "0.2.0"
+rand = "0.8.5"
+rand_seeder = "0.3.0"
+rand_isaac = "0.3.0"
+rand_hc = "0.3.2"
 
 # Reduce the size of the executable  file:
 [profile.release]
@@ -30,4 +33,4 @@ panic = 'abort'
 strip = true
 
 [build-dependencies]
-windows_exe_info = "0.4"
+windows_exe_info = "0.4.2"

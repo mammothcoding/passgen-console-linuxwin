@@ -1,17 +1,17 @@
 pub mod ui {
     use crate::generator::generator::Generator;
     use ratatui::layout::Alignment::Center;
-    use ratatui::layout::{Alignment, Flex, Layout, Rect};
+    use ratatui::layout::{Alignment, Flex, Layout, Position, Rect};
     use ratatui::prelude::{Line, Modifier, Span, Style, Stylize};
     use ratatui::widgets::{Block, BorderType, Borders, Paragraph};
     use ratatui::Frame;
 
     pub fn draw_ui(f: &mut Frame, generator: &Generator) {
-        if f.size().height < 40 {
+        if f.area().height < 40 {
             // Expand check
             let expand_text = format!(
                 "▲▼ Please expand the window to accommodate the contents / Пожалуйста, разверните окно для вмещения содержимого ▲▼ {}/40",
-                f.size().height
+                f.area().height
             );
             f.render_widget(
                 Paragraph::new(expand_text.to_string())
@@ -19,7 +19,7 @@ pub mod ui {
                     .on_black()
                     .alignment(Alignment::Center),
                 centered_rect(
-                    Rect::new(0, 0, f.size().width, 1),
+                    Rect::new(0, 0, f.area().width, 1),
                     expand_text.len() as u16,
                     1,
                 ),
@@ -33,7 +33,7 @@ pub mod ui {
                 .on_black();
             f.render_widget(
                 main_block,
-                centered_rect(Rect::new(0, 0, f.size().width, 40), 70, 40),
+                centered_rect(Rect::new(0, 0, f.area().width, 40), 70, 40),
             );
 
             // Title
@@ -49,7 +49,7 @@ pub mod ui {
                 .alignment(Alignment::Center);
             f.render_widget(
                 par,
-                centered_rect(Rect::new(0, 1, f.size().width, 3), 60, 3),
+                centered_rect(Rect::new(0, 1, f.area().width, 3), 60, 3),
             );
 
             // Legend
@@ -102,7 +102,7 @@ pub mod ui {
                 .alignment(Alignment::Center);
             f.render_widget(
                 par,
-                centered_rect(Rect::new(0, 4, f.size().width, 7), 60, 7),
+                centered_rect(Rect::new(0, 4, f.area().width, 7), 60, 7),
             );
 
             // Lang indicator
@@ -119,11 +119,11 @@ pub mod ui {
             };
             f.render_widget(
                 Paragraph::new(ind).alignment(Alignment::Right),
-                centered_rect(Rect::new(0, 36, f.size().width, 1), 68, 1),
+                centered_rect(Rect::new(0, 36, f.area().width, 1), 68, 1),
             );
 
             // Password length input area
-            let pwd_len_field_area = centered_rect(Rect::new(0, 11, f.size().width, 3), 44, 3);
+            let pwd_len_field_area = centered_rect(Rect::new(0, 11, f.area().width, 3), 44, 3);
             let mut pwd_len_field = Paragraph::new(generator.pwd_len.as_str()).block(
                 Block::default()
                     .borders(Borders::ALL)
@@ -145,10 +145,10 @@ pub mod ui {
                 pwd_len_field.white()
             };
             f.render_widget(pwd_len_field, pwd_len_field_area);
-            f.set_cursor(
+            f.set_cursor_position(Position::from((
                 pwd_len_field_area.x + generator.cursor_position as u16 + 1,
                 pwd_len_field_area.y + 1,
-            );
+            )));
 
             // Rules
             let fields = if generator.lang.as_str() == "en" {
@@ -175,7 +175,7 @@ pub mod ui {
                 } else {
                     "-"
                 };
-                let fi_area = centered_rect(Rect::new(0, field.2, f.size().width, 3), 44, 3);
+                let fi_area = centered_rect(Rect::new(0, field.2, f.area().width, 3), 44, 3);
                 let mut field_par = Paragraph::new(format!(" {}   {}", on_criteria, field.1))
                     .block(Block::default().borders(Borders::ALL));
                 field_par = if generator.rules_position == field.0 {
@@ -230,7 +230,7 @@ pub mod ui {
                     .alignment(Alignment::Center);
                 f.render_widget(
                     par,
-                    centered_rect(Rect::new(0, 30, f.size().width, 6), 55, 6),
+                    centered_rect(Rect::new(0, 30, f.area().width, 6), 55, 6),
                 );
             }
 
@@ -248,7 +248,7 @@ pub mod ui {
                 .alignment(Alignment::Center);
             f.render_widget(
                 par,
-                centered_rect(Rect::new(0, 37, f.size().width, 2), 68, 2),
+                centered_rect(Rect::new(0, 37, f.area().width, 2), 68, 2),
             );
         }
     }
