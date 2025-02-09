@@ -12,10 +12,19 @@ Cross-platform console-gui-tool for generating cryptographically secure password
 
 [CSPRNGs](https://rust-random.github.io/book/guide-rngs.html#cryptographically-secure-pseudo-random-number-generators-csprngs) Isaac64Rng and Hc128Rng are used.
 
-![alt text](./App_screen.png "passgen-console-linuxwin")
+![alt text](./passgen-console_demo.gif "passgen-console_demo.gif")
 
 [Releases/Builded packages](https://github.com/mammothcoding/passgen-console-linuxwin/releases/)
 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Our other passgen projects:
+[passgen-lib](https://github.com/mammothcoding/passgen-lib)
+
+[passgen-desktop](https://github.com/mammothcoding/passgen-desktop)
+
+[passgen-cmd](https://github.com/mammothcoding/passgen-cmd)
+
+[passgen-telegram](https://github.com/mammothcoding/passgen-telegram)
